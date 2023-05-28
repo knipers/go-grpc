@@ -25,6 +25,8 @@ message AuthorGetRequest {
 
 service AuthorService {
     rpc CreateAuthor(CreateAuthorRequest) returns (Author) {}
+    rpc CreateAuthorStream(stream CreateAuthorRequest) returns (AuthorList) {}
+    rpc CreateAuthorBidirectional(stream CreateAuthorRequest) returns (stream Author) {}
     rpc ListAuthors(Blank) returns (AuthorList) {}
     rpc FindById(AuthorGetRequest) returns (Author) {}
 }

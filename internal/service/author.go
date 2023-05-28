@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"io"
 
 	"github.com/knipers/go-grpc/internal/database"
 	"github.com/knipers/go-grpc/internal/pb"
@@ -64,4 +65,59 @@ func (a *AuthorService) FindById(ctx context.Context, in *pb.AuthorGetRequest) (
 		Id:   author.ID,
 		Name: author.Name,
 	}, nil
+}
+
+func (a *AuthorService) CreateAuthorStream(stream pb.AuthorService_CreateAuthorStreamServer) error {
+	authors := &pb.AuthorList{}
+
+	for {
+		author, err := stream.Recv()
+
+		if err == io.EOF {
+			return stream.SendAndClose(authors)
+		}
+
+		if err != nil {
+			return err
+		}
+
+		authorResult, err := a.AuthorDB.Create(author.Name)
+
+		if err != nil {
+			return err
+		}
+
+		authors.Authors = append(authors.Authors, &pb.Author{
+			Id:   authorResult.ID,
+			Name: authorResult.Name,
+		})
+	}
+}
+
+func (a *AuthorService) CreateAuthorBidirectional(stream pb.AuthorService_CreateAuthorBidirectionalServer) error {
+	for {
+		author, err := stream.Recv()
+
+		if err == io.EOF {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		authorResult, err := a.AuthorDB.Create(author.Name)
+
+		if err != nil {
+			return err
+		}
+
+		if err := stream.Send(&pb.Author{
+			Id:   authorResult.ID,
+			Name: authorResult.Name,
+		}); err != nil {
+			return err
+		}
+	}
+
 }
