@@ -19,9 +19,14 @@ message AuthorList {
 
 message Blank {}
 
+message AuthorGetRequest {
+    string id = 1;
+}
+
 service AuthorService {
     rpc CreateAuthor(CreateAuthorRequest) returns (Author) {}
     rpc ListAuthors(Blank) returns (AuthorList) {}
+    rpc FindById(AuthorGetRequest) returns (Author) {}
 }
 
 //protoc --go_out=. --go-grpc_out=. proto/book_author.proto

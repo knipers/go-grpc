@@ -52,3 +52,16 @@ func (a *AuthorService) ListAuthors(ctx context.Context, _ *pb.Blank) (*pb.Autho
 	}, nil
 
 }
+
+func (a *AuthorService) FindById(ctx context.Context, in *pb.AuthorGetRequest) (*pb.Author, error) {
+	author, err := a.AuthorDB.FindById(in.Id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.Author{
+		Id:   author.ID,
+		Name: author.Name,
+	}, nil
+}
