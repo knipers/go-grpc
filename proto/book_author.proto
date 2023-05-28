@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "internal/pb";
+
+message Author {
+    string id = 1;
+    string name = 2;
+}
+
+message CreateAuthorRequest {
+    string name = 1;
+}
+
+message AuthorList {
+    repeated Author authors = 1;
+}
+
+message Blank {}
+
+service AuthorService {
+    rpc CreateAuthor(CreateAuthorRequest) returns (Author) {}
+    rpc ListAuthors(Blank) returns (AuthorList) {}
+}
+
+//protoc --go_out=. --go-grpc_out=. proto/book_author.proto
